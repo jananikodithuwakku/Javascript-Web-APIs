@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function Orientation() {
+export default function Assignment_1() {
   const [alpha, setAlpha] = useState(null); // Z-axis rotation
   const [beta, setBeta] = useState(null);   // X-axis rotation
   const [gamma, setGamma] = useState(null); // Y-axis rotation
