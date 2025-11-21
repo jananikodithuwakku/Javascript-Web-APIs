@@ -24,24 +24,29 @@ export default function NotificationAppMUI() {
     setPermission(result);
   };
 
-  // trigger notification after selected delay
   const triggerNotification = () => {
-    if (permission !== "granted") return alert("Give permission first!");
+  if (permission !== "granted") return alert("Give permission first!");
 
-    setTimeout(() => {
-        // show notification
-      new Notification(title || "No Title", {
-        body: body || "No description",
-        icon: image || undefined,
-      });
+  // save values BEFORE reset
+  const notifTitle = title || "No Title";
+  const notifBody = body || "No description";
+  const notifImage = image || undefined;
 
-      // reset form
-      setTitle("");
-      setBody("");
-      setImage(null);
-      setDelay(0);
-    }, delay);
-  };
+  // reset immediately
+  setTitle("");
+  setBody("");
+  setImage(null);
+  setDelay(0);
+
+  // trigger notification later
+  setTimeout(() => {
+    new Notification(notifTitle, {
+      body: notifBody,
+      icon: notifImage,
+    });
+  }, delay);
+};
+
 
   // handle uploaded image for notification icon
   const handleImageChange = (e) => {
