@@ -9,6 +9,7 @@ function App() {
         <li><a href="#/assignment_1">Device Orientation</a></li>
         <li><a href="#/assignment_2">Notification Sent</a></li>
         <li><a href="#/assignment_3">Current Location</a></li>
+        <li><a href="#/assignment_4">Speak and Record</a></li>
       </ul>
     </>
   );
