@@ -6,15 +6,18 @@ const HEIGHT = 300;
 const BOX_W = 60; // catcher box width 
 const BOX_H = 40; // catcher box height 
 const CIRCLE_R = 15; // circle radius 
-const GRAVITY = 0.35; // falling speed 
+const GRAVITY = 0.45; // falling speed 
 const SPAWN_MS = 1000; // new circle appear(ms)
 
 export default function Assignment_6() {
   const [score, setScore] = useState(0); 
   const [circles, setCircles] = useState([]); // falling circles
   const [boxX, setBoxX] = useState(WIDTH / 2 - BOX_W / 2); // box horizontal position
+  const [motionEnabled, setMotionEnabled] = useState(false); // true after iOS permission
+  const [permissionNeeded, setPermissionNeeded] = useState(false); // show Enable Motion button
   const boxXRef = useRef(boxX); // box X position
   const rafRef = useRef(null); // animation frame ID
+  const spawnRef = useRef(null); // spawn ID
 
   useEffect(() => {
     boxXRef.current = boxX;
@@ -22,7 +25,9 @@ export default function Assignment_6() {
 
   // spawn circles and start loop
   useEffect(() => {
-    const spawn = setInterval(() => {
+     if (!motionEnabled) return;
+
+    spawnRef.current = setInterval(() => {
       const x = CIRCLE_R + Math.random() * (WIDTH - 2 * CIRCLE_R);
       setCircles((prev) => [...prev, { id: Math.random(), x, y: -CIRCLE_R }]);
     }, SPAWN_MS);
@@ -30,13 +35,13 @@ export default function Assignment_6() {
     rafRef.current = requestAnimationFrame(gameLoop);
 
     return () => {
-      clearInterval(spawn);
+      clearInterval(spawnRef.current);
       cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [motionEnabled]);
 
   // check circle caught in the box 
-  function isCaught(circle) {
+  const isCaught = (circle) => {
     const boxTop = HEIGHT / 2 - BOX_H / 2;
     const boxBottom = boxTop + BOX_H;
     const boxLeft = boxXRef.current;
@@ -52,7 +57,7 @@ export default function Assignment_6() {
   }
 
   // move circles  
-  function gameLoop() {
+ const gameLoop = () => {
     setCircles((prev) => {
       const updated = [];
 
@@ -78,7 +83,7 @@ export default function Assignment_6() {
   // device controls (mobile) 
   useEffect(() => {
     function handleTilt(e) {
-      if (e.gamma == null) return;
+      if (!motionEnabled || e.gamma == null) return;
 
       const maxTilt = 45;
       const clamped = Math.max(-maxTilt, Math.min(maxTilt, e.gamma));
@@ -91,7 +96,7 @@ export default function Assignment_6() {
     }
 
     return () => window.removeEventListener("deviceorientation", handleTilt);
-  }, []);
+  }, [motionEnabled]);
 
   // mouse move control
   useEffect(() => {
@@ -106,16 +111,50 @@ export default function Assignment_6() {
   }, []);
 
   
-  function resetGame() {
+  // iOS permission
+  const enableMotion = async () => {
+    if (
+      typeof DeviceOrientationEvent !== "undefined" &&
+      typeof DeviceOrientationEvent.requestPermission === "function"
+    ) {
+      try {
+        const permission = await DeviceOrientationEvent.requestPermission();
+        if (permission === "granted") setMotionEnabled(true);
+      } catch (err) {
+        console.warn("Motion permission denied", err);
+      }
+    } else {
+      setMotionEnabled(true); // non-iOS
+    }
+  };
+
+  // detect if iOS requires permission
+  useEffect(() => {
+    if (
+      typeof DeviceOrientationEvent !== "undefined" &&
+      typeof DeviceOrientationEvent.requestPermission === "function"
+    ) {
+      setPermissionNeeded(true);
+    } else {
+      setMotionEnabled(true);
+    }
+  }, []);
+
+  const resetGame = () => {
     setScore(0);
     setCircles([]);
     setBoxX(WIDTH / 2 - BOX_W / 2);
-  }
+  };
 
   return (
     <div className="game-page">
       <div className="score">
         <div>Score: <strong>{score}</strong></div>
+
+        {permissionNeeded && !motionEnabled && (
+          <button onClick={enableMotion}>Enable Motion</button>
+        )}
+
         <button onClick={resetGame}>Reset</button>
       </div>
 
