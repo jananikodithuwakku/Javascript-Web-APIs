@@ -25,7 +25,7 @@ const canPlaceItem = (x, items) => {
     return !items.some(item => Math.abs(item.x -x)< minItemGpa)
 }
 
-export default function App() {
+export default function Assignment_7() {
   // current score
   const score = useRef(0)
   // list of items [{ x, y }]

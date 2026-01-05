@@ -1,0 +1,34 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.game {
+  width: 360px;
+  height: 500px;
+  margin: 20px auto;
+  position: relative;
+  overflow: hidden;
+  background: black;
+}
+
+.road {
+  position: absolute;
+  inset: 0;
+  background: url("./Images/highway-rush-road.png") repeat-y;
+  background-size: 100% auto;
+}
+
+.car {
+  position: absolute;
+  background-image: url("./Images/highway-rush-cars.png");
+  background-repeat: no-repeat;
+}
+
+.player {
+  width: 48px;
+  height: 94px;
+  bottom: 40px;
+  background-position: -66px -15px;
+}
